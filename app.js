@@ -82,18 +82,24 @@ buscar.addEventListener('click', () => {
 
 btnBuscarPorTitulo.addEventListener('click', (e) => {
     e.preventDefault()
-    tarjetas.forEach((element) => {
-        element.innerHTML = ``
-    })
-    const mostrarBusqueda = buscarPorTitulo(inputBuscarPorTitulo)
-    mostrarBusqueda.then(datos => {
-        let datosAimprimir = datos
-        imprimir(datosAimprimir)
-        let botonBuscarPorTitulo = document.querySelectorAll('.toinfo')
-        toPageInfo(botonBuscarPorTitulo)
-        deleteFilters()
-    })
-    inputBuscarPorTitulo.value = ""
+    const regularExpression = /^\w+[^_]/
+    if(regularExpression.test(inputBuscarPorTitulo.value)){
+        tarjetas.forEach((element) => {
+            element.innerHTML = ``
+        })
+        const mostrarBusqueda = buscarPorTitulo(inputBuscarPorTitulo)
+        mostrarBusqueda.then(datos => {
+            let datosAimprimir = datos
+            imprimir(datosAimprimir)
+            let botonBuscarPorTitulo = document.querySelectorAll('.toinfo')
+            toPageInfo(botonBuscarPorTitulo)
+            deleteFilters()
+        })
+        inputBuscarPorTitulo.value = ""
+        inputBuscarPorTitulo.classList.remove('error')
+    }else{
+        inputBuscarPorTitulo.classList.add('error')
+    }
 })
 
 openMenu.addEventListener('click', (e) => {

@@ -217,6 +217,10 @@ nav #filters #filtros button{
     transition: all .5s;
 }
 
+#contenedor div:last-child #input-search input.error{
+    border:3px solid red;
+}
+
 nav #filters #filtros button:hover{
     background-color: white;
     color:black;
