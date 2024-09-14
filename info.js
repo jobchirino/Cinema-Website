@@ -25,70 +25,67 @@ const options = {
 	}
 };
 
-document.addEventListener('DOMContentLoaded', (e) => {
-    e.stopPropagation()
+function obtenerDatos(){
     url = `https://streaming-availability.p.rapidapi.com/shows/${array[0][1]}?series_granularity=season&output_language=en`;
-    fetch(url, options)
-    .then((respuesta) => {
-        const promesa = respuesta.json()
-        promesa
-            .then((datos) => {
-                let data = datos
-                console.log(data)
+    return fetch(url, options)
+    .then((res => res.json())) 
+}
 
-                poster.setAttribute('src', `${data.imageSet.verticalPoster.w240}`)
-                background.style.backgroundImage = `url(${data.imageSet.horizontalBackdrop.w720})`
-                titulo.innerHTML = `${data.title}`
-                stars.innerHTML  = `${data.cast[0]}, ${data.cast[1]}, ${data.cast[2]}`
+const mostrarDatos = obtenerDatos()
+mostrarDatos.then(datos => {
+    let data = datos
+    poster.setAttribute('src', `${data.imageSet.verticalPoster.w240}`)
+    background.style.backgroundImage = `url(${data.imageSet.horizontalBackdrop.w720})`
+    titulo.innerHTML = `${data.title}`
+    stars.innerHTML  = `${data.cast[0]}, ${data.cast[1]}, ${data.cast[2]}`
 
-                for(let i = 0; i < data.genres.length; i++){
-                    if(i == data.genres.length - 1){
-                        generos.innerHTML += `${data.genres[i].name}.`
-                        break
-                    }
-                    generos.innerHTML += `${data.genres[i].name}, `
-                }
-                
-               
-                sinopsis.innerHTML = `${data.overview}`
-                rating.innerHTML   = `Rating: ${data.rating}`
-                let streamingFiltrado = data.streamingOptions.us.filter(n => n.type === 'subscription')
-                streaming.innerHTML = `Disponible en: ${data.streamingOptions.us[0].service.name}`
+    for(let i = 0; i < data.genres.length; i++){
+        if(i == data.genres.length - 1){
+            generos.innerHTML += `${data.genres[i].name}.`
+            break
+        }
+        generos.innerHTML += `${data.genres[i].name}, `
+    }
+    
+   
+    sinopsis.innerHTML = `${data.overview}`
+    rating.innerHTML   = `Rating: ${data.rating}`
+    streaming.innerHTML = `Disponible en: ${data.streamingOptions.us[0].service.name}`
+    
 
-                if(data.showType === 'series'){
-                    seasonCount.innerHTML = `${data.seasonCount} Seasons`
-                    capCount.innerHTML = `${data.episodeCount} Episodes`
-                    firstYear.innerHTML = `Año de estreno: ${data.firstAirYear}`
-                    lastYear.innerHTML = `Ultimo año de emisión: ${data.lastAirYear}`
-                    link.setAttribute('href', `${streamingFiltrado[0].videoLink}`)
+    if(data.showType === 'series'){
+        seasonCount.innerHTML = `${data.seasonCount} Seasons`
+        capCount.innerHTML = `${data.episodeCount} Episodes`
+        firstYear.innerHTML = `Año de estreno: ${data.firstAirYear}`
+        lastYear.innerHTML = `Ultimo año de emisión: ${data.lastAirYear}`
+        if(data.streamingOptions.us[0].link){
+            link.setAttribute('href', `${data.streamingOptions.us[0].link}`)
+        }else{
+            link.setAttribute('href', `${data.streamingOptions.us[0].service.videoLink}`)
+        }
 
-                    for(let i = 0; i < data.creators.length; i++){
-                        if(i == data.creators.length - 1){
-                            director.innerHTML += `${data.creators[i]}.`
-                            break
-                        }
-                        director.innerHTML += `${data.creators[i]}, `
-                    }
+        for(let i = 0; i < data.creators.length; i++){
+            if(i == data.creators.length - 1){
+                director.innerHTML += `${data.creators[i]}.`
+                break
+            }
+            director.innerHTML += `${data.creators[i]}, `
+        }
 
-                }else{
-                    for(let i = 0; i < data.directors.length; i++){
-                        if(i === data.directors.length - 1){
-                            director.innerHTML += `${data.directors[i]}.`
-                            break
-                        }
-                        director.innerHTML += `${data.directors[i]}, `
-                    }
-                    seasonCount.innerHTML = `${data.runtime} min`
-                    firstYear.innerHTML   =  `Año de estreno: ${data.releaseYear}`
-                    link.setAttribute('href', `${streamingFiltrado[0].link}`)
-                }
+    }else{
+        for(let i = 0; i < data.directors.length; i++){
+            if(i === data.directors.length - 1){
+                director.innerHTML += `${data.directors[i]}.`
+                break
+            }
+            director.innerHTML += `${data.directors[i]}, `
+        }
+        seasonCount.innerHTML = `${data.runtime} min`
+        firstYear.innerHTML   =  `Año de estreno: ${data.releaseYear}`
+        link.setAttribute('href', `${data.streamingOptions.us[0].service.link}`)
+    }
 
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        })
-        .catch((error) => {
-            console.log(error)
-        })
+    if(titulo.innerText.length > 13){
+        titulo.classList.add('large')
+    }
 })

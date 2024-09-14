@@ -1,17 +1,100 @@
-var openMenu  = document.getElementById('open-menu')
-var closeMenu = document.getElementById('close-menu')
-var dropdown  = document.getElementById('dropdown')
-var tarjetas  = document.querySelectorAll('.tarjeta')
-var peliculas = document.getElementById('movies')
-var series    = document.getElementById('series')
-var generos   = document.querySelectorAll('.genre')
-var urlGenero = '&genres=' 
-var urlType   = 'movie'
-var buscar    = document.getElementById('buscar')
+let openMenu  = document.getElementById('open-menu')
+let closeMenu = document.getElementById('close-menu')
+let dropdown  = document.getElementById('dropdown')
+let tarjetas  = document.querySelectorAll('.tarjeta')
+let peliculas = document.getElementById('movies')
+let series    = document.getElementById('series')
+let generos   = document.querySelectorAll('.genre')
+let urlGenero = '&genres=' 
+let urlType   = 'movie'
+let buscar    = document.getElementById('buscar')
 const yearMin = document.getElementById('yearMin')
 const yearMax = document.getElementById('yearMax')
-var btnBuscarPorTitulo   = document.getElementById('enviar')
-var inputBuscarPorTitulo = document.getElementById('camp')
+let btnBuscarPorTitulo   = document.getElementById('enviar')
+let inputBuscarPorTitulo = document.getElementById('camp')
+
+function imprimir(data){
+    let i = 0
+    data.forEach(() => {
+        tarjetas[i].innerHTML = `<img src="${data[i].imageSet.verticalPoster.w240}"/>
+                                 <button class="toinfo" data-id="${data[i].imdbId}">
+                                    <p data-id="${data[i].imdbId}">${data[i].title}</p>
+                                 </button>`
+        i++
+    })
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    mostrarPeliculas.then(datos => {
+        let datosAImprimir = datos.shows
+        let data = datos
+        if(data.message){
+            alert('Limite de consultas a la API excedido')
+        }
+        imprimir(datosAImprimir)
+        let button = document.querySelectorAll('.toinfo')
+        toPageInfo(button)        
+    })
+})
+
+
+series.addEventListener('click', (e) => {
+    e.stopPropagation()
+    series.classList.add('active')
+    peliculas.classList.add('active')
+    urlType   = 'series'
+    deleteFilters()
+    mostrarSeries.then(datos => {
+        let datosAImprimir = datos.shows
+        imprimir(datosAImprimir)
+        let buttonSeries = document.querySelectorAll('.toinfo')
+        toPageInfo(buttonSeries)
+        titleLarge()
+    })
+})
+
+peliculas.addEventListener('click', (e) => {
+    e.stopPropagation()
+    series.classList.remove('active')
+    peliculas.classList.remove('active')
+    urlType   = 'movie'
+    deleteFilters()
+    mostrarPeliculas.then(datos => {
+        let datosAImprimir = datos.shows
+        imprimir(datosAImprimir)
+        let buttonPeliculas = document.querySelectorAll('.toinfo')
+        toPageInfo(buttonPeliculas)
+    })
+})
+
+buscar.addEventListener('click', () => {
+    if(urlGenero[urlGenero.length - 1] !== '='){
+        dropdown.classList.remove('open')
+        const mostrarFiltrado = buscarPorGenero(urlType, urlGenero, yearMax, yearMin)
+        mostrarFiltrado.then(datos => {
+            let datosAImprimir = datos.shows
+            imprimir(datosAImprimir)
+            let buttonPeliculas = document.querySelectorAll('.toinfo')
+            toPageInfo(buttonPeliculas)
+        })
+    }
+})
+
+btnBuscarPorTitulo.addEventListener('click', (e) => {
+    e.preventDefault()
+    tarjetas.forEach((element) => {
+        element.innerHTML = ``
+    })
+    const mostrarBusqueda = buscarPorTitulo(inputBuscarPorTitulo)
+    mostrarBusqueda.then(datos => {
+        let datosAimprimir = datos
+        imprimir(datosAimprimir)
+        let botonBuscarPorTitulo = document.querySelectorAll('.toinfo')
+        toPageInfo(botonBuscarPorTitulo)
+        deleteFilters()
+    })
+    inputBuscarPorTitulo.value = ""
+})
 
 openMenu.addEventListener('click', (e) => {
     e.stopPropagation()
@@ -63,21 +146,17 @@ function titleLarge(){
 })
 }
 
-function toPageInfo (){
-    const urlInfo = 'file:///C:/Users/maria/Desktop/Programaci%C3%B3n/Java%20Script/Cinema%20website/info.html?'
-    let toinfo    = document.querySelectorAll('.toinfo')
-    console.log(toinfo)
-    toinfo.forEach((element) => {
+function toPageInfo (boton){
+    const urlInfo = './info.html?'
+    boton.forEach((element) => {
         element.addEventListener('click', (e) => {
             e.stopPropagation()
             let objId     = {
                 id: `${e.target.dataset.id}`
             }
-            console.log(e.target.dataset.id)
             let searchParams = new URLSearchParams(objId)
             let queryString  = searchParams.toString()
             window.location.href = urlInfo + queryString
-            console.log('funcionando')
         })
     })
 }
@@ -103,61 +182,5 @@ generos.forEach((elementos) => {
             }
             
         }
-        console.log(urlGenero)
     })
-})
-
-document.addEventListener('DOMContentLoaded', () => {
-    mostrarPeliculas()
-    setTimeout(() => {
-        titleLarge()
-        toPageInfo()
-    }, 2000)
-})
-
-peliculas.addEventListener('click', (e) => {
-    e.stopPropagation()
-    series.classList.remove('active')
-    peliculas.classList.remove('active')
-    urlType   = 'movie'
-    mostrarPeliculas()
-    deleteFilters()
-    setTimeout(() => {
-        titleLarge()
-        toPageInfo()
-    }, 2000)
-})
-
-series.addEventListener('click', (e) => {
-    e.stopPropagation()
-    series.classList.add('active')
-    peliculas.classList.add('active')
-    urlType   = 'series'
-    mostrarSeries()
-    deleteFilters()
-    setTimeout(() => {
-        titleLarge()
-        toPageInfo()
-    }, 2000)
-})
-
-buscar.addEventListener('click', () => {
-    if(urlGenero[urlGenero.length - 1] !== '='){
-        dropdown.classList.remove('open')
-        buscarPorGenero()
-        setTimeout(() => {
-            titleLarge()
-            toPageInfo()
-        }, 2000)
-    }
-})
-
-btnBuscarPorTitulo.addEventListener('click', (e) => {
-    e.preventDefault()
-    buscarPorTitulo()    
-    setTimeout(() => {
-        titleLarge()
-        toPageInfo()
-    }, 2000)
-    inputBuscarPorTitulo.value = ""
 })

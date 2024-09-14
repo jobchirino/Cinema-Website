@@ -110,8 +110,10 @@ header{
 }
 
 #titulo h1{
-    font-size:50px;
+    font-size:40px;
+    text-align: center;
 }
+
 
 #sinopsis-info{
     width:50%;
@@ -235,5 +237,9 @@ header{
     #poster-info #info{
         height:40%;
 
+    }
+
+    #titulo h1.large{
+        font-size:25px;
     }
 }
