@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 })
 
-
 series.addEventListener('click', (e) => {
     e.stopPropagation()
     series.classList.add('active')
@@ -118,27 +117,15 @@ function deleteFilters (){
     })
 }
 
-function incrementMin(){
-    if(parseInt(yearMin.value) < 2024){
-        yearMin.value = parseInt(yearMin.value) + 1
+function incrementYears(max){
+    if(parseInt(max.value) < 2024){
+        max.value = parseInt(max.value) + 1
     }
 }
 
-function incrementMax(){
-    if(parseInt(yearMax.value) < 2024){
-        yearMax.value = parseInt(yearMax.value) + 1
-    }
-}
-
-function decrementMin(){
-    if(parseInt(yearMin.value) > 1980){
-        yearMin.value = parseInt(yearMin.value) - 1
-    }
-}
-
-function decrementMax(){
-    if(parseInt(yearMax.value) > 1980){
-        yearMax.value = parseInt(yearMax.value) - 1
+function decrementYears(min){
+    if(parseInt(min.value) > 1980){
+        min.value = parseInt(min.value) - 1
     }
 }
 
